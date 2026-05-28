@@ -1,4 +1,5 @@
 import { HOME_HERO } from "./config";
+import HeroSearch from "./HeroSearch";
 
 export default function Hero() {
   return (
@@ -29,7 +30,7 @@ export default function Hero() {
         <p className="text-lg md:text-2xl max-w-2xl mx-auto">
           {HOME_HERO.subheading}
         </p>
-
+        <HeroSearch />
       </div>
     </section>
   );

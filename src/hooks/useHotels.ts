@@ -6,15 +6,18 @@ import { getHotels } from "@/services/hotel.service";
 
 import { Hotel } from "@/types/hotel";
 
-export default function useHotels() {
+export default function useHotels(
+  limit?: number
+) {
   const [hotels, setHotels] = useState<Hotel[]>([]);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
     async function fetchHotels() {
       try {
-        const data = await getHotels();
+        const data = await getHotels(limit);
 
         setHotels(data);
 
@@ -27,7 +30,8 @@ export default function useHotels() {
     }
 
     fetchHotels();
-  }, []);
+
+  }, [limit]);
 
   return {
     hotels,

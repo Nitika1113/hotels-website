@@ -140,15 +140,18 @@ export default function Navbar({ authPage = false }: NavbarProps) {
       <div className="backdrop-blur-xl bg-black/40 border-b border-white/10">
         <Container>
           <nav className="flex items-center justify-between h-16">
-            
+
             {/* LOGO */}
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/logo.png"
-                alt="Dream Stay"
-                width={120}
-                height={40}
-                priority
+                alt="logo"
+                width={100}
+                height={20}
+                style={{
+                  width: "auto",
+                  height: "auto",
+                }}
               />
             </Link>
 

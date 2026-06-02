@@ -1,206 +1,192 @@
-// "use client";
-
-// import Link from "next/link";
-
-// import useHotels from "@/hooks/useHotels";
-
-// import HotelCard from "./HotelCard";
-
-// interface HotelListProps {
-//   showAll?: boolean;
-// }
-
-// export default function HotelList({
-//   showAll = false,
-// }: HotelListProps) {
-
-//   const {
-//     hotels,
-//     loading,
-//   } = useHotels(showAll);
-
-//   if (loading) {
-//     return (
-//       <p className="text-center py-20 text-lg">
-//         Loading Hotels...
-//       </p>
-//     );
-//   }
-
-//   return (
-//     <section className="py-24">
-
-//       <div className="max-w-7xl mx-auto px-6">
-
-//         {/* HEADER */}
-//         <div className="flex items-center justify-between mb-14">
-
-//           <div>
-
-//             <h2 className="text-4xl font-bold mb-2">
-//               {showAll
-//                 ? "All Hotels"
-//                 : "The Collection"}
-//             </h2>
-
-//             <p className="text-gray-500">
-//               Luxury stays crafted for unforgettable moments.
-//             </p>
-
-//           </div>
-
-//         </div>
-
-//         {/* HOTELS */}
-//         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-//           {hotels.map((hotel) => (
-//             <HotelCard
-//               key={hotel._id}
-//               hotel={hotel}
-//             />
-//           ))}
-
-//         </div>
-
-//         {/* VIEW ALL BUTTON */}
-//         {!showAll && (
-//           <div className="flex justify-center mt-14">
-
-//             <Link
-//               href="/hotels"
-//               className="
-//                 px-8
-//                 py-4
-//                 rounded-full
-//                 bg-black
-//                 text-white
-//                 hover:bg-gray-800
-//                 transition
-//               "
-//             >
-//               View All Hotels
-//             </Link>
-
-//           </div>
-//         )}
-
-//       </div>
-
-//     </section>
-//   );
-// }
-
-
 "use client";
 
 import Link from "next/link";
+
+import { ArrowUpRight } from "lucide-react";
 
 import useHotels from "@/hooks/useHotels";
 
 import HotelCard from "./HotelCard";
 
 export default function HotelList() {
-
-  // ONLY 6 HOTELS
   const {
     hotels,
     loading,
   } = useHotels(6);
 
+  // LOADING STATE
   if (loading) {
     return (
-      <section className="py-24 bg-[#f8f8f8]">
-        <p className="text-center text-lg text-gray-500">
-          Loading Hotels...
-        </p>
+      <section className="bg-[#f7f5f2] py-28">
+        <div className="mx-auto max-w-8xl px-10">
+          {/* HEADER SKELETON */}
+          <div className="mb-16 animate-pulse">
+            <div className="mb-5 h-4 w-40 rounded-full bg-gray-200" />
+
+            <div className="mb-4 h-14 w-[320px] rounded-xl bg-gray-200" />
+
+            <div className="h-5 w-full max-w-2xl rounded-full bg-gray-200" />
+          </div>
+
+          {/* CARDS SKELETON */}
+          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="overflow-hidden rounded-4xl bg-white shadow-sm"
+                >
+                  {/* IMAGE */}
+                  <div className="h-80 animate-pulse bg-gray-200" />
+
+                  {/* CONTENT */}
+                  <div className="p-6">
+                    <div className="mb-4 h-7 w-3/4 animate-pulse rounded-lg bg-gray-200" />
+
+                    <div className="mb-3 h-4 w-full animate-pulse rounded-full bg-gray-200" />
+
+                    <div className="mb-8 h-4 w-2/3 animate-pulse rounded-full bg-gray-200" />
+
+                    <div className="flex items-center justify-between">
+                      <div className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+
+                      <div className="h-11 w-28 animate-pulse rounded-full bg-gray-200" />
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="py-24 bg-[#d3d3d3]">
-
-      <div className="max-w-7xl mx-auto px-6">
-
+    <section className="bg-[#f7f5f2] py-20">
+      <div className="mx-auto max-w-8xl px-15">
         {/* HEADER */}
-        <div className="flex items-end justify-between mb-14">
-
-          <div>
-
-            <p className="text-md font-extrabold uppercase tracking-[0.3em] text-gray-800 mb-4">
+        <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          {/* LEFT CONTENT */}
+          <div className="max-w-2xl">
+            <span
+              className="
+                inline-flex
+                items-center
+                rounded-full
+                border
+                border-black/10
+                bg-white/80
+                px-4
+                py-2
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.3em]
+                text-[#8b6b45]
+                backdrop-blur-md
+              "
+            >
               Luxury Collection
-            </p>
+            </span>
 
-            <h2 className="text-5xl font-bold text-black mb-3">
+            <h2
+              className="
+                mt-3
+                text-4xl
+                font-semibold
+                leading-tight
+                tracking-tight
+                text-[#1f1f1f]
+                md:text-6xl
+              "
+            >
               Featured Hotels
             </h2>
 
-            <p className="text-gray-500 text-lg max-w-2xl">
-              Discover premium destinations crafted for unforgettable stays and timeless experiences.
+            <p
+              className="
+                mt-2
+                text-lg
+                leading-relaxed
+                text-gray-500
+              "
+            >
+              Discover premium destinations crafted
+              for unforgettable stays, timeless
+              elegance, and elevated hospitality
+              experiences.
             </p>
-
           </div>
 
+          {/* DESKTOP BUTTON */}
           <Link
             href="/hotels"
             className="
-              hidden md:flex
+              hidden
+              md:inline-flex
               items-center
-              justify-center
-              px-6
-              py-3
+              gap-2
               rounded-full
               border
-              border-black
-              text-black
+              border-black/10
+              bg-white
+              px-6
+              py-3
               text-sm
               font-medium
-              hover:bg-black
-              hover:text-white
+              text-[#1f1f1f]
+              shadow-sm
               transition-all
               duration-300
+              hover:-translate-y-1
+              hover:bg-[#1f1f1f]
+              hover:text-white
+              hover:shadow-lg
             "
           >
             View All Hotels
-          </Link>
 
+            <ArrowUpRight size={18} />
+          </Link>
         </div>
 
         {/* HOTELS GRID */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {hotels.map((hotel) => (
             <HotelCard
               key={hotel._id}
               hotel={hotel}
             />
           ))}
-
         </div>
 
         {/* MOBILE BUTTON */}
-        <div className="flex justify-center mt-12 md:hidden">
-
+        <div className="mt-14 flex justify-center md:hidden">
           <Link
             href="/hotels"
             className="
-              px-6
-              py-3
+              inline-flex
+              items-center
+              gap-2
               rounded-full
-              bg-black
-              text-white
+              bg-[#1f1f1f]
+              px-7
+              py-3.5
               text-sm
               font-medium
-              hover:bg-gray-800
-              transition
+              text-white
+              transition-all
+              duration-300
+              hover:bg-[#c29b6a]
+              hover:shadow-xl
             "
           >
             View All Hotels
+
+            <ArrowUpRight size={18} />
           </Link>
-
         </div>
-
       </div>
     </section>
   );

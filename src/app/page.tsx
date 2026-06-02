@@ -1,18 +1,3 @@
-// import Hero from "@/components/home/Hero";
-
-// import Features from "@/components/home/Features";
-
-// import HotelList from "@/components/home/HotelList";
-
-// export default function HomePage() {
-//   return (
-//     <>
-//       <Hero />
-//       <Features />
-//       <HotelList />
-//     </>
-//   );
-// }
 
 
 import Hero from "@/components/home/Hero";

@@ -7,7 +7,7 @@ export const NAV_LINKS: NavItem[] = [
   },
   {
     label: "Hotels",
-    href: "/search",
+    href: "/hotels",
   },
   {
     label: "Bookings",

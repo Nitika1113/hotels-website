@@ -20,7 +20,7 @@ export default function HeroSearch() {
 
   const router = useRouter();
 
-  // ✅ FIX HYDRATION ISSUE
+
   const [mounted, setMounted] =
     useState(false);
 
@@ -41,7 +41,7 @@ export default function HeroSearch() {
 
   // GUESTS
   const [adults, setAdults] =
-    useState(2);
+    useState(1);
 
   const [children, setChildren] =
     useState(0);
@@ -60,7 +60,7 @@ export default function HeroSearch() {
   const [suggestions, setSuggestions] =
     useState<string[]>([]);
 
-  // ✅ FIX HYDRATION
+
   if (!mounted) return null;
 
   // LOCATION SEARCH
@@ -135,10 +135,10 @@ export default function HeroSearch() {
       className="
         mt-10
         bg-white
-        rounded-[40px]
+        rounded-[20px]
 
-        px-8
-        py-6
+        px-6
+        py-4
 
         shadow-[0_20px_60px_rgba(0,0,0,0.12)]
 
@@ -162,8 +162,9 @@ export default function HeroSearch() {
           className="
             text-sm
             font-medium
-            text-gray-500
+            text-gray-900
             mb-2
+            
           "
         >
           Destination
@@ -180,12 +181,14 @@ export default function HeroSearch() {
           }
           className="
             h-12
-            px-4
+            px-5
             rounded-2xl
             border
-            border-gray-200
-            outline-none
+            border-gray-300
+          bg-[#c29b6a]/10  
             text-black
+            outline-none
+            hover:border-black
             focus:border-black
             focus:shadow-md
             transition-all
@@ -203,7 +206,8 @@ export default function HeroSearch() {
               w-full
               bg-white
               border
-              border-gray-100
+              hover:shadow-xl
+              border-gray-300
               rounded-3xl
               shadow-[0_20px_60px_rgba(0,0,0,0.15)]
               overflow-hidden
@@ -228,9 +232,11 @@ export default function HeroSearch() {
                     w-full
                     text-left
                     px-5
+                    cursor-pointer
                     py-4
-                    hover:bg-gray-50
+                    hover:bg-yellow-50
                     text-black
+                    
                     transition
                   "
                 >
@@ -252,8 +258,9 @@ export default function HeroSearch() {
           className="
             text-sm
             font-medium
-            text-gray-500
+            text-gray-900
             mb-2
+            
           "
         >
           Check In
@@ -277,10 +284,13 @@ export default function HeroSearch() {
             w-full
             px-5
             rounded-2xl
+             bg-[#c29b6a]/10
             border
-            border-gray-200
+            cursor-pointer
+            border-gray-300
             outline-none
-            text-black
+             text-black
+             hover:border-black
             focus:border-black
             focus:shadow-md
             transition-all
@@ -296,7 +306,7 @@ export default function HeroSearch() {
           className="
             text-sm
             font-medium
-            text-gray-500
+            text-gray-900
             mb-2
           "
         >
@@ -322,12 +332,15 @@ export default function HeroSearch() {
             h-12
             w-full
             px-5
+            cursor-pointer
             rounded-2xl
             border
-            border-gray-200
+             bg-[#c29b6a]/10
+            border-gray-300
             outline-none
             text-black
             focus:border-black
+             hover:border-black
             focus:shadow-md
             transition-all
           "
@@ -336,13 +349,13 @@ export default function HeroSearch() {
       </div>
 
       {/* GUESTS */}
-      <div className="relative flex flex-col">
+      <div className="relative flex  flex-col">
 
         <label
           className="
             text-sm
             font-medium
-            text-gray-500
+            text-gray-900
             mb-2
           "
         >
@@ -358,11 +371,12 @@ export default function HeroSearch() {
           }
           className="
             h-12
-            px-5
+            px-6
             rounded-2xl
+            cursor-pointer
             border
-            border-gray-200
-            bg-white
+            border-gray-300
+            bg-[#c29b6a]/10
             flex
             items-center
             justify-between
@@ -373,7 +387,7 @@ export default function HeroSearch() {
           "
         >
 
-          <div className="flex flex-col">
+          <div className="flex flex-col ">
 
             <span
               className="
@@ -412,6 +426,7 @@ export default function HeroSearch() {
             className={`
               transition-transform
               duration-300
+              text-black
               ${
                 guestOpen
                   ? "rotate-180"
@@ -437,7 +452,7 @@ export default function HeroSearch() {
               shadow-[0_20px_60px_rgba(0,0,0,0.15)]
 
               border
-              border-gray-100
+              border-gray-300
 
               p-6
               z-50
@@ -448,7 +463,7 @@ export default function HeroSearch() {
             {/* ADULTS */}
             <CounterRow
               title="Adults"
-              subtitle="Age 13+"
+              subtitle="Age 18+"
               value={adults}
               onDecrease={() =>
                 setAdults(
@@ -468,7 +483,7 @@ export default function HeroSearch() {
             {/* CHILDREN */}
             <CounterRow
               title="Children"
-              subtitle="Age 0-12"
+              subtitle="Age 0-18"
               value={children}
               onDecrease={() =>
                 setChildren(
@@ -522,6 +537,7 @@ export default function HeroSearch() {
                   className="
                     font-semibold
                     text-black
+                    flex justify-start items-start
                   "
                 >
                   Pets
@@ -549,12 +565,13 @@ export default function HeroSearch() {
                   rounded-full
                   px-1
                   flex
+                  cursor-pointer
                   items-center
                   transition-all
 
                   ${
                     pets
-                      ? "bg-black justify-end"
+                      ? "bg-[#d4b794] justify-end"
                       : "bg-gray-300 justify-start"
                   }
                 `}
@@ -583,11 +600,13 @@ export default function HeroSearch() {
                 w-full
                 h-11
                 rounded-2xl
-                bg-black
-                text-white
+                   bg-[#c29b6a]/30
+            cursor-pointer
+                text-black
                 font-medium
-                hover:bg-gray-800
+              
                 transition
+                hover:bg-[#d4b794]
               "
             >
               Done
@@ -602,21 +621,21 @@ export default function HeroSearch() {
       <button
         onClick={handleSearch}
         className="
-          h-16
-          rounded-2xl
-          bg-black
-          text-white
-
+          h-12
+          rounded-full
+           bg-[#c29b6a]/10
+          text-black
+          hover:bg-[#d4b794]
+          hover:border-black
           flex
+          cursor-pointer
           items-center
           justify-center
           gap-2
-
-          hover:bg-gray-800
-
           transition-all
           font-semibold
           shadow-lg
+          
         "
       >
 
@@ -660,6 +679,7 @@ function CounterRow({
           className="
             font-semibold
             text-black
+            flex justify-start items-start
           "
         >
           {title}
@@ -694,8 +714,11 @@ function CounterRow({
             border
             border-gray-300
             text-xl
+            bg-[#c29b6a]/30
             hover:border-black
             transition
+            cursor-pointer
+            text-black
           "
         >
           -
@@ -706,6 +729,7 @@ function CounterRow({
             w-5
             text-center
             font-medium
+            text-black
           "
         >
           {value}
@@ -719,10 +743,13 @@ function CounterRow({
             h-10
             rounded-full
             border
+            bg-[#c29b6a]/30
             border-gray-300
             text-xl
+            cursor-pointer
             hover:border-black
             transition
+            text-black
           "
         >
           +

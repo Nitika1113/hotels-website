@@ -1,201 +1,90 @@
 import Image from "next/image";
-
+import Link from "next/link";
+import { MapPin, Star } from "lucide-react";
 import { Hotel } from "@/types/hotel";
 
 interface HotelCardProps {
   hotel: Hotel;
 }
 
-export default function HotelCard({
-  hotel,
-}: HotelCardProps) {
+export default function HotelCard({ hotel }: HotelCardProps) {
   return (
-    <div
-      className="
-        bg-white
-        rounded-2xl
-        overflow-hidden
-        shadow-sm
-        hover:shadow-xl
-        transition
-      "
-    >
+    <article className="group overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
+
       {/* IMAGE */}
-      <div className="relative h-72">
+      <div className="relative h-80 overflow-hidden">
         <Image
-  src={hotel.image}
-  alt={hotel.name}
-  fill
-  sizes="(max-width: 768px) 100vw, 33vw"
-  className="object-cover"
-/>
+          src={hotel.featuredImage || "/placeholder.jpg"}
+          alt={hotel.name}
+          fill
+          priority={false}
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
+
+        {hotel.propertyType && (
+          <div className="absolute top-5 left-5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 text-xs font-semibold text-white tracking-wide">
+            {hotel.propertyType}
+          </div>
+        )}
+
+        <div className="absolute top-5 right-5 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 backdrop-blur-md shadow-md">
+          <Star size={13} className="fill-amber-400 text-amber-400" />
+          <span className="text-sm font-bold text-stone-800">{hotel.reviewScore ?? "N/A"}</span>
+        </div>
+
+        <div className="absolute bottom-5 left-5 flex items-center gap-1.5 text-white">
+          <MapPin size={15} className="text-amber-400 shrink-0" />
+          <p className="text-sm font-medium tracking-wide">
+            {hotel.location?.city
+              ? `${hotel.location.city}${hotel.location.country ? ", " + hotel.location.country : ""}`
+              : hotel.location?.country ?? ""}
+          </p>
+        </div>
       </div>
 
       {/* CONTENT */}
       <div className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-gray-500 text-sm">
-            {hotel.location}
-          </p>
+        {hotel.starRating > 0 && (
+          <div className="flex items-center gap-0.5 mb-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} size={12}
+                className={i < hotel.starRating ? "fill-amber-400 text-amber-400" : "fill-stone-200 text-stone-200"}
+              />
+            ))}
+            <span className="ml-1.5 text-xs text-stone-400">({hotel.reviewCount ?? 0} reviews)</span>
+          </div>
+        )}
 
-          <span className="text-sm">
-            ⭐ {hotel.rating ?? "N/A"}
-          </span>
+        <div className="mb-5">
+          <h3 className="text-xl font-semibold text-[#1f1f1f] mb-1.5 line-clamp-1">{hotel.name}</h3>
+          <p className="text-sm leading-relaxed text-gray-500 line-clamp-2">
+            {hotel.description ?? "Experience premium comfort with beautifully designed rooms and exceptional hospitality."}
+          </p>
         </div>
 
-        <h3 className="text-2xl font-semibold mb-4">
-          {hotel.name}
-        </h3>
+        <div className="h-px bg-stone-100 mb-5" />
 
         <div className="flex items-center justify-between">
-          <p className="font-bold text-xl">
-            ₹{hotel.price}/night
-          </p>
+          <div>
+            <p className="text-[0.65rem] font-bold uppercase tracking-widest text-stone-400 mb-0.5">Starting from</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold tracking-tight text-[#1f1f1f]">
+                ₹{hotel.startingPrice?.toLocaleString("en-IN")}
+              </span>
+              <span className="text-sm text-gray-400">/ night</span>
+            </div>
+          </div>
 
-          <button
-            className="
-              border
-              px-5
-              py-2
-              rounded-lg
-              hover:bg-black
-              hover:text-white
-              transition
-            "
+          <Link
+            href={`/hotels/${hotel.slug}`}
+            className="rounded-full bg-[#1f1f1f] px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-[#c29b6a] hover:shadow-lg hover:shadow-amber-200/50 active:scale-95 cursor-pointer"
           >
-            Book Now
-          </button>
+            View Stay
+          </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
-
-
-// import Image from "next/image";
-// import Link from "next/link";
-
-// import { Hotel } from "@/types/hotel";
-
-// interface HotelCardProps {
-//   hotel: Hotel;
-// }
-
-// export default function HotelCard({
-//   hotel,
-// }: HotelCardProps) {
-//   return (
-//     <div
-//       className="
-//         group
-//         bg-white
-//         border
-//         border-gray-200
-//         rounded-3xl
-//         overflow-hidden
-//         transition-all
-//         duration-300
-//         hover:-translate-y-1
-//         hover:shadow-2xl
-//       "
-//     >
-//       {/* IMAGE */}
-//       <div className="relative h-72 overflow-hidden">
-
-//         <Image
-//           src={hotel.image}
-//           alt={hotel.name}
-//           fill
-//           sizes="(max-width: 768px) 100vw, 33vw"
-//           className="
-//             object-cover
-//             transition-transform
-//             duration-500
-//             group-hover:scale-105
-//           "
-//         />
-
-//         {/* OVERLAY */}
-//         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-
-//         {/* RATING */}
-//         <div
-//           className="
-//             absolute
-//             top-4
-//             right-4
-//             px-3
-//             py-1.5
-//             rounded-full
-//             bg-white/90
-//             backdrop-blur-md
-//             text-black
-//             text-sm
-//             font-medium
-//             shadow-md
-//           "
-//         >
-//           ⭐ {hotel.rating ?? "N/A"}
-//         </div>
-
-//       </div>
-
-//       {/* CONTENT */}
-//       <div className="p-6">
-
-//         {/* LOCATION */}
-//         <p className="text-sm text-gray-500 mb-3">
-//           {hotel.location}
-//         </p>
-
-//         {/* NAME */}
-//         <h3
-//           className="
-//             text-2xl
-//             font-semibold
-//             text-black
-//             mb-6
-//             line-clamp-1
-//           "
-//         >
-//           {hotel.name}
-//         </h3>
-
-//         {/* FOOTER */}
-//         <div className="flex items-center justify-between">
-
-//           <div>
-//             <p className="text-sm text-gray-500">
-//               Starting from
-//             </p>
-
-//             <p className="text-2xl font-bold text-black">
-//               ₹{hotel.price}
-//               <span className="text-sm text-gray-500 font-medium">
-//                 /night
-//               </span>
-//             </p>
-//           </div>
-
-//           <Link
-//             href={`/hotels/${hotel._id}`}
-//             className="
-//               px-5
-//               py-2.5
-//               rounded-full
-//               bg-black
-//               text-white
-//               text-sm
-//               font-semibold
-//               hover:bg-gray-800
-//               transition
-//             "
-//           >
-//             View
-//           </Link>
-
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

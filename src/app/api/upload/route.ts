@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { v2 as cloudinary } from "cloudinary";
 
-// ✅ Cloudinary config
+// Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -27,12 +27,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ convert file into buffer
+    // convert file into buffer
     const bytes = await file.arrayBuffer();
 
     const buffer = Buffer.from(bytes);
 
-    // ✅ upload to cloudinary
+    // upload to cloudinary
     const result: any = await new Promise(
       (resolve, reject) => {
         cloudinary.uploader
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     console.log("CLOUDINARY RESULT:", result);
 
-    // ✅ IMPORTANT
+    // IMPORTANT
     return NextResponse.json({
       success: true,
       secure_url: result.secure_url,

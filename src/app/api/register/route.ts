@@ -1,5 +1,3 @@
-
-
 import bcrypt from "bcryptjs";
 
 import { connectedDB } from "@/lib/mongodb";

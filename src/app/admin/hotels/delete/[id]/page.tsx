@@ -11,7 +11,15 @@ interface Props {
 async function deleteHotel(id: string) {
   "use server";
   const db = await connectedDB();
+
+  // Delete the hotel
   await db.collection("hotels").deleteOne({ _id: new ObjectId(id) });
+
+  // Delete all rooms belonging to this hotel (covers both string and ObjectId stored hotelId)
+  await db.collection("rooms").deleteMany({
+    $or: [{ hotelId: id }, { hotelId: new ObjectId(id) }],
+  });
+
   redirect("/admin/hotels");
 }
 
@@ -19,10 +27,17 @@ export default async function DeleteHotelPage({ params }: Props) {
   const { id } = await params;
 
   let hotel = null;
+  let roomCount = 0;
 
   try {
     const db = await connectedDB();
     hotel = await db.collection("hotels").findOne({ _id: new ObjectId(id) });
+
+    if (hotel) {
+      roomCount = await db.collection("rooms").countDocuments({
+        $or: [{ hotelId: id }, { hotelId: new ObjectId(id) }],
+      });
+    }
   } catch {
     notFound();
   }
@@ -47,7 +62,7 @@ export default async function DeleteHotelPage({ params }: Props) {
         </div>
 
         {/* HOTEL PREVIEW */}
-        <div className="flex items-center gap-4 rounded-2xl border border-stone-100 bg-stone-50 p-4 mb-8">
+        <div className="flex items-center gap-4 rounded-2xl border border-stone-100 bg-stone-50 p-4 mb-5">
           <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-stone-200">
             {hotel.featuredImage ? (
               <Image
@@ -66,12 +81,36 @@ export default async function DeleteHotelPage({ params }: Props) {
           <div>
             <h2 className="font-semibold text-black">{hotel.name}</h2>
             <p className="text-sm text-stone-500">
-              {hotel.location?.city}{hotel.location?.country ? `, ${hotel.location.country}` : ""}
+              {hotel.location?.city}
+              {hotel.location?.country ? `, ${hotel.location.country}` : ""}
             </p>
             <p className="text-sm text-stone-400">
               ₹{hotel.startingPrice?.toLocaleString("en-IN")} / night · {hotel.propertyType}
             </p>
           </div>
+        </div>
+
+        {/* WHAT WILL BE DELETED */}
+        <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-4 mb-8">
+          <p className="text-[0.7rem] font-bold uppercase tracking-widest text-red-400 mb-2">
+            The following will be permanently deleted
+          </p>
+          <ul className="space-y-1.5 text-sm text-red-700">
+            <li className="flex items-center gap-2">
+              <span className="text-red-400">✕</span>
+              Hotel listing &amp; all its details
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-red-400">✕</span>
+              {roomCount > 0
+                ? `${roomCount} room type${roomCount !== 1 ? "s" : ""} linked to this hotel`
+                : "Any linked room types"}
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-red-400">✕</span>
+              All images, amenities, and policy data
+            </li>
+          </ul>
         </div>
 
         {/* ACTIONS */}

@@ -6,10 +6,6 @@ const cards = [
     href: "/admin/hotels",
   },
   {
-    title: "Rooms",
-    href: "/admin/rooms",
-  },
-  {
     title: "Bookings",
     href: "/admin/bookings",
   },

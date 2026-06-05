@@ -1,34 +1,3 @@
-// interface Props {
-//   facilities: string[];
-// }
-
-// export default function HotelAmenities({
-//   facilities,
-// }: Props) {
-//   return (
-//     <section className="mt-12">
-//       <h2 className="mb-6 text-3xl font-bold">
-//         Amenities
-//       </h2>
-
-//       <div className="grid gap-4 md:grid-cols-3">
-//         {facilities.map((item) => (
-//           <div
-//             key={item}
-//             className="
-//               rounded-xl
-//               border
-//               p-4
-//             "
-//           >
-//             {item}
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
-
 interface Props {
   amenities: {
     facilities?: string[];

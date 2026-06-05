@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +7,7 @@ import HotelOverview from "./HotelOverview";
 import HotelAmenities from "./HotelAmenities";
 import HotelGallery from "./HotelGallery";
 import HotelRooms from "./HotelRooms";
+import { serialize } from "@/lib/serialize";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -17,19 +17,29 @@ export default async function HotelPage({ params }: Props) {
   const { slug } = await params;
   const db = await connectedDB();
 
-  const hotel = await db.collection("hotels").findOne({ slug });
-  if (!hotel) notFound();
+  const rawHotel = await db.collection("hotels").findOne({ slug });
 
-  const rooms = await db
-    .collection("rooms")
-    .find({ hotelId: hotel._id.toString(), active: true })
-    .toArray();
+if (!rawHotel) {
+  notFound();
+}
+
+const rawRooms = await db
+  .collection("rooms")
+  .find({
+    hotelId: rawHotel._id.toString(),
+    active: true,
+  })
+  .toArray();
+
+const hotel = serialize(rawHotel);
+
+const rooms = serialize(rawRooms);
 
   return (
     <div className="min-h-screen bg-[#faf7f2]">
 
       {/* ── HERO ── */}
-      <div className="relative h-[72vh] min-h-130 w-full overflow-hidden">
+      <div className="relative h-[92vh] min-h-150 w-full overflow-hidden">
         <Image
           src={hotel.featuredImage || "/placeholder.jpg"}
           alt={hotel.name}
@@ -119,16 +129,15 @@ export default async function HotelPage({ params }: Props) {
             <div className="rounded-2xl bg-white border border-stone-100 p-7 shadow-sm mb-6">
               <HotelOverview description={hotel.description} highlights={hotel.highlights} />
             </div>
-
-            <div className="rounded-2xl bg-white border border-stone-100 p-7 shadow-sm mb-6">
-              <HotelAmenities amenities={hotel.amenities || {}} />
-            </div>
-
-            {hotel.gallery?.length > 0 && (
+{hotel.gallery?.length > 0 && (
               <div className="rounded-2xl bg-white border border-stone-100 p-7 shadow-sm mb-6">
                 <HotelGallery images={hotel.gallery} />
               </div>
             )}
+
+            <div className="rounded-2xl bg-white border border-stone-100 p-7 shadow-sm mb-6">
+              <HotelAmenities amenities={hotel.amenities || {}} />
+            </div>
 
             {rooms.length > 0 && (
               <div className="rounded-2xl bg-white border border-stone-100 p-7 shadow-sm mb-6">

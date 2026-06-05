@@ -10,25 +10,34 @@ interface Props {
 export default async function EditHotelPage({ params }: Props) {
   const { id } = await params;
 
-  let hotel = null;
+  const db = await connectedDB();
 
-  try {
-    const db = await connectedDB();
-    hotel = await db.collection("hotels").findOne({ _id: new ObjectId(id) });
-  } catch {
-    notFound();
-  }
+  const hotel = await db
+    .collection("hotels")
+    .findOne({ _id: new ObjectId(id) });
 
   if (!hotel) notFound();
 
-  const initialData = {
-    ...hotel,
-    _id: hotel._id.toString(),
-  };
+  const rooms = await db
+    .collection("rooms")
+    .find({
+      $or: [
+        { hotelId: id },
+        { hotelId: new ObjectId(id) },
+      ],
+    })
+    .toArray();
+
+  const serializedHotel = JSON.parse(JSON.stringify(hotel));
+  const serializedRooms = JSON.parse(JSON.stringify(rooms));
 
   return (
     <section className="mx-auto max-w-7xl p-8">
-      <HotelForm mode="edit" initialData={initialData} />
+      <HotelForm
+        mode="edit"
+        initialData={serializedHotel}
+        initialRooms={serializedRooms}
+      />
     </section>
   );
 }

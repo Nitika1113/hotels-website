@@ -1,23 +1,3 @@
-// interface Props {
-//   description: string;
-// }
-
-// export default function HotelOverview({
-//   description,
-// }: Props) {
-//   return (
-//     <section className="mt-12">
-//       <h2 className="mb-5 text-3xl font-bold">
-//         Overview
-//       </h2>
-
-//       <p className="leading-8 text-gray-600">
-//         {description}
-//       </p>
-//     </section>
-//   );
-// }
-
 interface Props {
   description: string;
   highlights?: string[];

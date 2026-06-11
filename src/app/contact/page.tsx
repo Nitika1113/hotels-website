@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import { Send, CheckCircle, Mail, Phone, MapPin, Clock } from "lucide-react";
 
@@ -158,10 +158,10 @@ export default function ContactPage() {
           {/* RIGHT — CONTACT DETAILS */}
           <div className="flex flex-col gap-4">
             {[
-              { icon: <Phone size={18} />,  title: "Phone",        lines: ["+91 98765 43210", "+91 11 2345 6789"], sub: "Mon–Sat, 9am–7pm IST" },
-              { icon: <Mail size={18} />,   title: "Email",        lines: ["support@stayluxx.com", "bookings@stayluxx.com"], sub: "We reply within 24 hours" },
-              { icon: <MapPin size={18} />, title: "Head Office",  lines: ["12, Connaught Place", "New Delhi, India – 110001"], sub: "Visit by appointment only" },
-              { icon: <Clock size={18} />,  title: "Working Hours",lines: ["Mon–Fri: 9:00 AM – 7:00 PM", "Sat: 10:00 AM – 5:00 PM"], sub: "Closed Sundays & holidays" },
+              { icon: <Phone size={18} />,  title: "Phone",        lines: ["+91 98765 43210", "+91 11 2345 6789"], sub: "Mon-Sat, 9am–7pm IST" },
+              { icon: <Mail size={18} />,   title: "Email",        lines: ["nitika@silverferndigital.com", "bookings@dreamstay.com"], sub: "We reply within 24 hours" },
+              { icon: <MapPin size={18} />, title: "Head Office",  lines: ["12, Connaught Place", "New Delhi, India - 110001"], sub: "Visit by appointment only" },
+              { icon: <Clock size={18} />,  title: "Working Hours",lines: ["Mon-Fri: 9:00 AM - 7:00 PM", "Sat: 10:00 AM - 5:00 PM"], sub: "Closed Sundays & holidays" },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 rounded-[20px] bg-white border border-black/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] p-5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-amber-200/60 transition-all duration-300">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 border border-amber-100 text-amber-500">
@@ -182,9 +182,9 @@ export default function ContactPage() {
               <p className="text-[0.6rem] font-bold tracking-[0.18em] uppercase text-amber-600 mb-1">Quick Help</p>
               <h3 className="text-base font-semibold text-[#1f1f1f] mb-1.5">Need instant answers?</h3>
               <p className="text-sm text-stone-500 mb-4">Browse our FAQ for common questions about bookings, policies, and more.</p>
-              <button className="w-full rounded-full border border-amber-200 bg-white py-2.5 text-sm font-semibold text-amber-700 hover:bg-[#c29b6a] hover:text-white hover:border-[#c29b6a] transition-all duration-200">
+              <Link href="/contact/faq"className="  rounded-full border border-amber-200 bg-white py-2.5 px-5 text-md font-semibold text-amber-700 hover:bg-[#c29b6a] hover:text-white hover:border-[#c29b6a] transition-all duration-200">
                 View FAQ
-              </button>
+              </Link>
             </div>
           </div>
 

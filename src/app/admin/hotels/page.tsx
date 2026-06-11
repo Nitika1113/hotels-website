@@ -3,7 +3,21 @@ import Image from "next/image";
 import HotelSearch from "../HotelSearch";
 
 import { connectedDB } from "@/lib/mongodb";
-
+interface Hotel {
+  _id: string;
+  name: string;
+  gallery?: string[];
+  featuredImage?: string;
+  propertyType?: string;
+  starRating?: number;
+  startingPrice?: number;
+  location?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    address?: string;
+  };
+}
 interface Props {
   searchParams: Promise<{
     q?: string;
@@ -34,12 +48,24 @@ export default async function AdminHotelsPage({
               $options: "i",
             },
           },
-          {
-            location: {
-              $regex: search,
-              $options: "i",
-            },
-          },
+         {
+  "location.address": {
+    $regex: search,
+    $options: "i",
+  },
+},
+{
+  "location.state": {
+    $regex: search,
+    $options: "i",
+  },
+},
+{
+  "location.country": {
+    $regex: search,
+    $options: "i",
+  },
+},
           {
             propertyType: {
               $regex: search,
@@ -59,7 +85,7 @@ export default async function AdminHotelsPage({
     .toArray();
 
   const normalizedHotels = hotels.map(
-    (hotel: any) => ({
+    (hotel) => ({
       ...hotel,
 
       displayImage:
@@ -73,10 +99,12 @@ export default async function AdminHotelsPage({
             ? hotel.image
             : "https://placehold.co/400x300/png",
 
-      displayCity:
-        hotel.location?.city ||
-        hotel.location ||
-        "Unknown",
+     displayCity: [
+  hotel.location?.city,
+  hotel.location?.state,
+]
+  .filter(Boolean)
+  .join(", ") || "Unknown",
 
       displayPrice:
         hotel.startingPrice ||

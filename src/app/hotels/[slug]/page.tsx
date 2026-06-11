@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -200,12 +201,17 @@ const rooms = serialize(rawRooms);
                   <span className="text-sm font-semibold text-stone-700">{hotel.reviewScore}</span>
                   <span className="text-sm text-stone-400">· {hotel.reviewCount} reviews</span>
                 </div>
-
-                <button className="w-full rounded-xl bg-black py-4 text-sm font-bold tracking-wide text-white transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-200/50 active:scale-[0.98]">
+                <Link
+                  href={`/booking/${hotel._id}?checkIn=${new Date().toISOString().slice(0,10)}&checkOut=${new Date(Date.now()+86400000).toISOString().slice(0,10)}&adults=2&rooms=1`}
+                  className="w-full block text-center rounded-xl bg-black py-4 text-sm font-bold tracking-wide text-white transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-200/50 active:scale-[0.98]"
+                >
                   Reserve Now
-                </button>
+                </Link>
 
-                <Link href="/booking" className="mt-3 flex w-full items-center justify-center rounded-xl border border-stone-200 py-3.5 text-sm font-semibold text-stone-700 transition-all hover:border-amber-400 hover:text-amber-600">
+                <Link
+                  href={`/booking/${hotel._id}?checkIn=${new Date().toISOString().slice(0,10)}&checkOut=${new Date(Date.now()+86400000).toISOString().slice(0,10)}&adults=2&rooms=1`}
+                  className="mt-3 flex w-full items-center justify-center rounded-xl border border-stone-200 py-3.5 text-sm font-semibold text-stone-700 transition-all hover:border-amber-400 hover:text-amber-600"
+                >
                   Check Availability
                 </Link>
 

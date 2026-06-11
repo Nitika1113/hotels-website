@@ -11,7 +11,7 @@ export const NAV_LINKS: NavItem[] = [
   },
   {
     label: "Bookings",
-    href: "/booking",
+    href: "/bookings",
   },
   {
     label: "Contact",

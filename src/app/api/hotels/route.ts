@@ -1,13 +1,23 @@
 
-
 import { connectedDB } from "@/lib/mongodb";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = searchParams.get("limit");
+    const limit  = searchParams.get("limit");
+    const id     = searchParams.get("id");
 
     const db = await connectedDB();
+
+    // Fetch single hotel by _id
+    if (id) {
+      const { ObjectId } = await import("mongodb");
+      if (!ObjectId.isValid(id.trim())) {
+        return Response.json({ success: false, message: "Invalid hotel ID" }, { status: 400 });
+      }
+      const hotel = await db.collection("hotels").findOne({ _id: new ObjectId(id.trim()) });
+      return Response.json({ success: true, data: hotel });
+    }
 
     const query = db.collection("hotels").find({ active: true });
 

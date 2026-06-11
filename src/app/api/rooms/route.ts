@@ -1,4 +1,49 @@
+
+
 import { connectedDB } from "@/lib/mongodb";
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+
+    const hotelId = searchParams.get("hotelId");
+
+    const db = await connectedDB();
+
+    const query: {
+      active: boolean;
+      hotelId?: string;
+    } = {
+      active: true,
+    };
+
+    if (hotelId) {
+      query.hotelId = hotelId;
+    }
+
+    const rooms = await db
+      .collection("rooms")
+      .find(query)
+      .toArray();
+
+    return Response.json({
+      success: true,
+      data: rooms,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return Response.json(
+      {
+        success: false,
+        message: "Failed to fetch rooms",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -7,7 +52,7 @@ export async function POST(req: Request) {
     const db = await connectedDB();
 
     const room = {
-      hotelId: body.hotelId,
+      hotelId: String(body.hotelId),
 
       name: body.name,
       slug: body.slug,
@@ -46,7 +91,9 @@ export async function POST(req: Request) {
       updatedAt: new Date(),
     };
 
-    const result = await db.collection("rooms").insertOne(room);
+    const result = await db
+      .collection("rooms")
+      .insertOne(room);
 
     return Response.json({
       success: true,

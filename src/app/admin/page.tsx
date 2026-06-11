@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const cards = [
   {
-    title: "Hotels",
+    title: "Create or Edit or Delete Hotels",
     href: "/admin/hotels",
   },
   {
@@ -13,6 +13,10 @@ const cards = [
     title: "Reviews",
     href: "/admin/reviews",
   },
+  {
+    title:"Help and Contact",
+    href:"/admin/contacts",
+  }
 ];
 
 export default function AdminPage() {

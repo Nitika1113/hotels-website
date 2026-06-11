@@ -1,53 +1,44 @@
 import { connectedDB } from "@/lib/mongodb";
-
+ 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-
     const query = searchParams.get("q");
-
+ 
     if (!query) {
-      return Response.json({
-        success: true,
-        data: [],
-      });
+      return Response.json({ success: true, data: [] });
     }
-
+ 
     const db = await connectedDB();
-
+ 
     const hotels = await db
       .collection("hotels")
       .find({
-        location: {
-          $regex: query,
-          $options: "i",
-        },
+        $or: [
+          { "location.city":    { $regex: query, $options: "i" } },
+          { "location.state":   { $regex: query, $options: "i" } },
+          { "location.country": { $regex: query, $options: "i" } },
+        ],
       })
-      .limit(5)
+      .limit(10)
       .toArray();
-
+ 
+    // Build unique location strings like "Chandigarh, Punjab, India"
     const locations = [
       ...new Set(
-        hotels.map((hotel) => hotel.location)
+        hotels.map((hotel) => {
+          const { city, state, country } = hotel.location || {};
+          return [city, state, country].filter(Boolean).join(", ");
+        })
       ),
-    ];
-
-    return Response.json({
-      success: true,
-      data: locations,
-    });
-
+    ].filter(Boolean);
+ 
+    return Response.json({ success: true, data: locations });
   } catch (error) {
     console.log(error);
-
     return Response.json(
-      {
-        success: false,
-        message: "Failed",
-      },
-      {
-        status: 500,
-      }
+      { success: false, message: "Failed" },
+      { status: 500 }
     );
   }
 }

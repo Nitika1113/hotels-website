@@ -6,8 +6,7 @@ import { Bodoni_Moda } from "next/font/google";
 
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-
-
+import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 
 export const metadata = {
@@ -104,11 +103,11 @@ export default function RootLayout({
           antialiased
         `}
       >
-        <Navbar />
-
-        <main>{children}</main>
-
-        <Footer />
+        <SessionProvider>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );

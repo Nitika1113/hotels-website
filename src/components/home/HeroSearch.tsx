@@ -1,762 +1,286 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
-import {
-  Search,
-  ChevronDown,
-} from "lucide-react";
-
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { Search, ChevronDown, MapPin } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
 
+const POPULAR_DESTINATIONS = [
+  "Mumbai", "Delhi", "Goa", "Jaipur", "Bangalore",
+  "Kerala", "Manali", "Shimla", "Udaipur", "Agra",
+];
+
 export default function HeroSearch() {
-
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
+  const today    = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const [mounted, setMounted] =
-    useState(false);
+  const [location, setLocation]           = useState("");
+  const [checkIn, setCheckIn]             = useState<Date | null>(today);
+  const [checkOut, setCheckOut]           = useState<Date | null>(tomorrow);
+  const [adults, setAdults]               = useState(1);
+  const [children, setChildren]           = useState(0);
+  const [rooms, setRooms]                 = useState(1);
+  const [pets, setPets]                   = useState(false);
+  const [guestOpen, setGuestOpen]         = useState(false);
+  const [suggestions, setSuggestions]     = useState<string[]>([]);
+  const [locationError, setLocationError] = useState("");
+  const [locationFocused, setLocationFocused] = useState(false);
+  const locationRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => setMounted(true), []);
+
+  // Close dropdown on outside click
   useEffect(() => {
-    setMounted(true);
+    function handleClick(e: MouseEvent) {
+      if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
+        setLocationFocused(false);
+        setSuggestions([]);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // LOCATION
-  const [location, setLocation] =
-    useState("");
-
-  // DATES
-  const [checkIn, setCheckIn] =
-    useState<Date | null>(null);
-
-  const [checkOut, setCheckOut] =
-    useState<Date | null>(null);
-
-  // GUESTS
-  const [adults, setAdults] =
-    useState(1);
-
-  const [children, setChildren] =
-    useState(0);
-
-  const [rooms, setRooms] =
-    useState(1);
-
-  const [pets, setPets] =
-    useState(false);
-
-  // DROPDOWN
-  const [guestOpen, setGuestOpen] =
-    useState(false);
-
-  // LOCATION SUGGESTIONS
-  const [suggestions, setSuggestions] =
-    useState<string[]>([]);
-
+  const handleLocationChange = async (value: string) => {
+    setLocation(value);
+    setLocationError("");
+    if (!value.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/search-location?q=${encodeURIComponent(value)}`);
+      const result = await res.json();
+      setSuggestions(result.data || []);
+    } catch {
+      setSuggestions([]);
+    }
+  };
 
   if (!mounted) return null;
 
-  // LOCATION SEARCH
-  const handleLocationChange = async (
-    value: string
-  ) => {
-
-    setLocation(value);
-
-    if (!value.trim()) {
-
-      setSuggestions([]);
-
-      return;
-
-    }
-
-    try {
-
-      const response = await fetch(
-        `/api/search-location?q=${value}`
-      );
-
-      const result =
-        await response.json();
-
-      setSuggestions(
-        result.data || []
-      );
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-  };
-
-  // SEARCH
   const handleSearch = () => {
-
-    const query =
-      new URLSearchParams({
-
-        location,
-
-        checkIn:
-          checkIn?.toISOString() ||
-          "",
-
-        checkOut:
-          checkOut?.toISOString() ||
-          "",
-
-        adults: adults.toString(),
-
-        children:
-          children.toString(),
-
-        rooms: rooms.toString(),
-
-        pets: pets.toString(),
-
-      });
-
-    router.push(
-      `/hotels?${query.toString()}`
-    );
+    if (!location.trim()) {
+      setLocationError("Please enter a destination first.");
+      return;
+    }
+    setLocationError("");
+    const query = new URLSearchParams({
+      location,
+      checkIn:  checkIn?.toISOString()  || "",
+      checkOut: checkOut?.toISOString() || "",
+      adults:   adults.toString(),
+      children: children.toString(),
+      rooms:    rooms.toString(),
+      pets:     pets.toString(),
+    });
+    router.push(`/hotels?${query.toString()}`);
   };
+
+  // What to show in the dropdown
+  const showPopular   = locationFocused && !location.trim();
+  const showSuggestions = suggestions.length > 0 && location.trim();
+  const showDropdown  = showPopular || showSuggestions;
+
+  const inputCls =
+    "h-12 px-5 rounded-2xl border bg-[#c29b6a]/10 text-black outline-none transition-all w-full";
 
   return (
-    <div
-      className="
-        mt-10
-        bg-white
-        rounded-[20px]
+    <div className="mt-10 max-w-7xl mx-auto">
+      <div className="bg-white rounded-[20px] px-6 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_0.8fr_0.8fr_1.3fr_0.6fr] gap-4 items-end">
 
-        px-6
-        py-4
+        {/* LOCATION */}
+        <div ref={locationRef} className="relative flex flex-col">
+          <label className="text-sm font-medium text-gray-900 mb-1">Destination</label>
+          <input
+            type="text"
+            placeholder="Where are you going?"
+            value={location}
+            onChange={(e) => handleLocationChange(e.target.value)}
+            onFocus={() => setLocationFocused(true)}
+            className={`${inputCls} ${
+              locationError
+                ? "border-red-400 focus:border-red-400 bg-red-50/30"
+                : "border-gray-300 hover:border-black focus:border-black focus:shadow-md"
+            }`}
+          />
 
-        shadow-[0_20px_60px_rgba(0,0,0,0.12)]
+          {locationError && (
+            <p className="absolute left-5 p-1 top-20 mt-1 text-xs font-medium text-white bg-red-500 items-center">
+              ⚠ {locationError}
+            </p>
+          )}
 
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        lg:grid-cols-[1fr_0.8fr_0.8fr_1.3fr_0.6fr]
+          {/* Dropdown — popular destinations OR search suggestions */}
+          {showDropdown && (
+            <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] overflow-hidden z-50">
 
-        gap-6
-        items-center
+              {showPopular && (
+                <>
+                  <p className="px-5 pt-4 pb-2 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#c29b6a]">
+                    Popular Destinations
+                  </p>
+                  {POPULAR_DESTINATIONS.map((dest) => (
+                    <button
+                      key={dest}
+                      type="button"
+                      onMouseDown={() => {
+                        setLocation(dest);
+                        setSuggestions([]);
+                        setLocationFocused(false);
+                        setLocationError("");
+                      }}
+                      className="w-full text-left px-5 py-3 hover:bg-amber-50 text-black text-sm transition flex items-center gap-3"
+                    >
+                      <MapPin size={14} className="text-[#c29b6a] shrink-0" />
+                      {dest}
+                    </button>
+                  ))}
+                </>
+              )}
 
-        max-w-7xl
-        mx-auto
-      "
-    >
-
-      {/* LOCATION */}
-      <div className="relative flex flex-col">
-
-        <label
-          className="
-            text-sm
-            font-medium
-            text-gray-900
-            mb-2
-            
-          "
-        >
-          Destination
-        </label>
-
-        <input
-          type="text"
-          placeholder="Where are you going?"
-          value={location}
-          onChange={(e) =>
-            handleLocationChange(
-              e.target.value
-            )
-          }
-          className="
-            h-12
-            px-5
-            rounded-2xl
-            border
-            border-gray-300
-          bg-[#c29b6a]/10  
-            text-black
-            outline-none
-            hover:border-black
-            focus:border-black
-            focus:shadow-md
-            transition-all
-          "
-        />
-
-        {/* LOCATION DROPDOWN */}
-        {suggestions.length > 0 && (
-          <div
-            className="
-              absolute
-              top-full
-              left-0
-              mt-3
-              w-full
-              bg-white
-              border
-              hover:shadow-xl
-              border-gray-300
-              rounded-3xl
-              shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-              overflow-hidden
-              z-50
-            "
-          >
-
-            {suggestions.map(
-              (item) => (
-
+              {showSuggestions && suggestions.map((item) => (
                 <button
                   key={item}
                   type="button"
-                  onClick={() => {
-
+                  onMouseDown={() => {
                     setLocation(item);
-
                     setSuggestions([]);
-
+                    setLocationFocused(false);
+                    setLocationError("");
                   }}
-                  className="
-                    w-full
-                    text-left
-                    px-5
-                    cursor-pointer
-                    py-4
-                    hover:bg-yellow-50
-                    text-black
-                    
-                    transition
-                  "
+                  className="w-full text-left px-5 py-3 hover:bg-amber-50 text-black text-sm transition flex items-center gap-3"
                 >
+                  <MapPin size={14} className="text-[#c29b6a] shrink-0" />
                   {item}
                 </button>
+              ))}
 
-              )
-            )}
+            </div>
+          )}
+        </div>
 
-          </div>
-        )}
-
-      </div>
-
-      {/* CHECK IN */}
-      <div className="flex flex-col">
-
-        <label
-          className="
-            text-sm
-            font-medium
-            text-gray-900
-            mb-2
-            
-          "
-        >
-          Check In
-        </label>
-
-        <DatePicker
-          selected={checkIn}
-          onChange={(
-            date: Date | null
-          ) =>
-            setCheckIn(date)
-          }
-          selectsStart
-          startDate={checkIn}
-          endDate={checkOut}
-          minDate={new Date()}
-          placeholderText="Select date"
-          dateFormat="dd MMM yyyy"
-          className="
-            h-12
-            w-full
-            px-5
-            rounded-2xl
-             bg-[#c29b6a]/10
-            border
-            cursor-pointer
-            border-gray-300
-            outline-none
-             text-black
-             hover:border-black
-            focus:border-black
-            focus:shadow-md
-            transition-all
-          "
-        />
-
-      </div>
-
-      {/* CHECK OUT */}
-      <div className="flex flex-col">
-
-        <label
-          className="
-            text-sm
-            font-medium
-            text-gray-900
-            mb-2
-          "
-        >
-          Check Out
-        </label>
-
-        <DatePicker
-          selected={checkOut}
-          onChange={(
-            date: Date | null
-          ) =>
-            setCheckOut(date)
-          }
-          selectsEnd
-          startDate={checkIn}
-          endDate={checkOut}
-          minDate={
-            checkIn || new Date()
-          }
-          placeholderText="Select date"
-          dateFormat="dd MMM yyyy"
-          className="
-            h-12
-            w-full
-            px-5
-            cursor-pointer
-            rounded-2xl
-            border
-             bg-[#c29b6a]/10
-            border-gray-300
-            outline-none
-            text-black
-            focus:border-black
-             hover:border-black
-            focus:shadow-md
-            transition-all
-          "
-        />
-
-      </div>
-
-      {/* GUESTS */}
-      <div className="relative flex  flex-col">
-
-        <label
-          className="
-            text-sm
-            font-medium
-            text-gray-900
-            mb-2
-          "
-        >
-          Guests & Rooms
-        </label>
-
-        <button
-          type="button"
-          onClick={() =>
-            setGuestOpen(
-              !guestOpen
-            )
-          }
-          className="
-            h-12
-            px-6
-            rounded-2xl
-            cursor-pointer
-            border
-            border-gray-300
-            bg-[#c29b6a]/10
-            flex
-            items-center
-            justify-between
-            text-left
-            hover:border-black
-            hover:shadow-md
-            transition-all
-          "
-        >
-
-          <div className="flex flex-col ">
-
-            <span
-              className="
-                text-black
-                font-semibold
-                text-sm
-              "
-            >
-              {adults + children}
-              {" "}Guests ·{" "}
-              {rooms}
-              {" "}
-              {rooms > 1
-                ? "Rooms"
-                : "Room"}
-
-              {pets
-                ? " · Pet Friendly"
-                : ""}
-            </span>
-
-            <span
-              className="
-                text-xs
-                text-gray-500
-                mt-1
-              "
-            >
-              Add guests & rooms
-            </span>
-
-          </div>
-
-          <ChevronDown
-            size={18}
-            className={`
-              transition-transform
-              duration-300
-              text-black
-              ${
-                guestOpen
-                  ? "rotate-180"
-                  : ""
+        {/* CHECK IN */}
+        <div className="flex flex-col">
+          <label className="text-sm font-medium text-gray-900 mb-1">Check In</label>
+          <DatePicker
+            selected={checkIn}
+            onChange={(d: Date | null) => {
+              setCheckIn(d);
+              // If check-out is before new check-in, push check-out forward by 1 day
+              if (d && checkOut && d >= checkOut) {
+                const next = new Date(d);
+                next.setDate(next.getDate() + 1);
+                setCheckOut(next);
               }
-            `}
+            }}
+            selectsStart
+            startDate={checkIn}
+            endDate={checkOut}
+            minDate={new Date()}
+            dateFormat="dd MMM yyyy"
+            className={`${inputCls} border-gray-300 hover:border-black focus:border-black focus:shadow-md cursor-pointer`}
           />
+        </div>
 
-        </button>
+        {/* CHECK OUT */}
+        <div className="flex flex-col">
+          <label className="text-sm font-medium text-gray-900 mb-1">Check Out</label>
+          <DatePicker
+            selected={checkOut}
+            onChange={(d: Date | null) => setCheckOut(d)}
+            selectsEnd
+            startDate={checkIn}
+            endDate={checkOut}
+            minDate={checkIn ? new Date(checkIn.getTime() + 86400000) : new Date()}
+            dateFormat="dd MMM yyyy"
+            className={`${inputCls} border-gray-300 hover:border-black focus:border-black focus:shadow-md cursor-pointer`}
+          />
+        </div>
 
-        {/* DROPDOWN */}
-        {guestOpen && (
-          <div
-            className="
-              absolute
-              top-full
-              left-0
-              mt-3
-              w-[320px]
-
-              bg-white
-              rounded-3xl
-              shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-
-              border
-              border-gray-300
-
-              p-6
-              z-50
-              space-y-6
-            "
+        {/* GUESTS */}
+        <div className="relative flex flex-col">
+          <label className="text-sm font-medium text-gray-900 mb-1">Guests & Rooms</label>
+          <button
+            type="button"
+            onClick={() => setGuestOpen(!guestOpen)}
+            className="h-12 px-6 rounded-2xl cursor-pointer border border-gray-300 bg-[#c29b6a]/10 flex items-center justify-between hover:border-black hover:shadow-md transition-all"
           >
+            <div className="flex flex-col text-left">
+              <span className="text-black font-semibold text-sm">
+                {adults + children} Guests · {rooms} {rooms > 1 ? "Rooms" : "Room"}{pets ? " · 🐾" : ""}
+              </span>
+              <span className="text-xs text-gray-500 mt-0.5">Add guests & rooms</span>
+            </div>
+            <ChevronDown size={18} className={`transition-transform duration-300 text-black ${guestOpen ? "rotate-180" : ""}`} />
+          </button>
 
-            {/* ADULTS */}
-            <CounterRow
-              title="Adults"
-              subtitle="Age 18+"
-              value={adults}
-              onDecrease={() =>
-                setAdults(
-                  Math.max(
-                    1,
-                    adults - 1
-                  )
-                )
-              }
-              onIncrease={() =>
-                setAdults(
-                  adults + 1
-                )
-              }
-            />
+          {guestOpen && (
+            <div className="absolute top-full left-0 mt-3 w-[320px] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-300 p-6 z-50 space-y-6">
+              <CounterRow title="Adults"   subtitle="Age 18+"         value={adults}   onDecrease={() => setAdults(Math.max(1, adults - 1))}     onIncrease={() => setAdults(adults + 1)} />
+              <CounterRow title="Children" subtitle="Age 0–18"        value={children} onDecrease={() => setChildren(Math.max(0, children - 1))} onIncrease={() => setChildren(children + 1)} />
+              <CounterRow title="Rooms"    subtitle="Number of rooms" value={rooms}    onDecrease={() => setRooms(Math.max(1, rooms - 1))}       onIncrease={() => setRooms(rooms + 1)} />
 
-            {/* CHILDREN */}
-            <CounterRow
-              title="Children"
-              subtitle="Age 0-18"
-              value={children}
-              onDecrease={() =>
-                setChildren(
-                  Math.max(
-                    0,
-                    children - 1
-                  )
-                )
-              }
-              onIncrease={() =>
-                setChildren(
-                  children + 1
-                )
-              }
-            />
-
-            {/* ROOMS */}
-            <CounterRow
-              title="Rooms"
-              subtitle="Number of rooms"
-              value={rooms}
-              onDecrease={() =>
-                setRooms(
-                  Math.max(
-                    1,
-                    rooms - 1
-                  )
-                )
-              }
-              onIncrease={() =>
-                setRooms(
-                  rooms + 1
-                )
-              }
-            />
-
-            {/* PETS */}
-            <div
-              className="
-                flex
-                items-center
-                justify-between
-                pt-4
-                border-t
-              "
-            >
-
-              <div>
-
-                <h4
-                  className="
-                    font-semibold
-                    text-black
-                    flex justify-start items-start
-                  "
+              <div className="flex items-center justify-between border-t">
+                <div>
+                  <h4 className="font-semibold text-black flex flex-start">Pets</h4>
+                  <p className="text-sm text-gray-500">Pet-friendly stays</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPets(!pets)}
+                  className={`w-14 h-7 rounded-full px-1 flex cursor-pointer items-center transition-all ${pets ? "bg-[#d4b794] justify-end" : "bg-gray-300 justify-start"}`}
                 >
-                  Pets
-                </h4>
-
-                <p
-                  className="
-                    text-sm
-                    text-gray-500
-                  "
-                >
-                  Pet-friendly stays
-                </p>
-
+                  <div className="w-5 h-5 bg-white rounded-full" />
+                </button>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setPets(!pets)
-                }
-                className={`
-                  w-14
-                  h-7
-                  rounded-full
-                  px-1
-                  flex
-                  cursor-pointer
-                  items-center
-                  transition-all
-
-                  ${
-                    pets
-                      ? "bg-[#d4b794] justify-end"
-                      : "bg-gray-300 justify-start"
-                  }
-                `}
+                onClick={() => setGuestOpen(false)}
+                className="w-full h-11 rounded-2xl bg-[#c29b6a]/30 cursor-pointer text-black font-medium border border-gray-200 hover:bg-[#d4b794]  hover:border-black transition"
               >
-
-                <div
-                  className="
-                    w-5
-                    h-5
-                    bg-white
-                    rounded-full
-                  "
-                />
-
+                Done
               </button>
-
             </div>
+          )}
+        </div>
 
-            {/* DONE */}
-            <button
-              type="button"
-              onClick={() =>
-                setGuestOpen(false)
-              }
-              className="
-                w-full
-                h-11
-                rounded-2xl
-                   bg-[#c29b6a]/30
-            cursor-pointer
-                text-black
-                font-medium
-              
-                transition
-                hover:bg-[#d4b794]
-              "
-            >
-              Done
-            </button>
-
-          </div>
-        )}
+        {/* SEARCH */}
+        <button
+          onClick={handleSearch}
+          className="h-12 rounded-full bg-[#c29b6a]/10 text-black hover:bg-[#d4b794] hover:border-black flex cursor-pointer items-center justify-center gap-2 transition-all font-semibold shadow-lg border border-gray-300"
+        >
+          <Search size={18} /> Search
+        </button>
 
       </div>
-
-      {/* SEARCH */}
-      <button
-        onClick={handleSearch}
-        className="
-          h-12
-          rounded-full
-           bg-[#c29b6a]/10
-          text-black
-          hover:bg-[#d4b794]
-          hover:border-black
-          flex
-          cursor-pointer
-          items-center
-          justify-center
-          gap-2
-          transition-all
-          font-semibold
-          shadow-lg
-          
-        "
-      >
-
-        <Search size={18} />
-
-        Search
-
-      </button>
-
     </div>
   );
 }
 
 interface CounterRowProps {
-  title: string;
-  subtitle: string;
-  value: number;
-  onDecrease: () => void;
-  onIncrease: () => void;
+  title: string; subtitle: string; value: number;
+  onDecrease: () => void; onIncrease: () => void;
 }
 
-function CounterRow({
-  title,
-  subtitle,
-  value,
-  onDecrease,
-  onIncrease,
-}: CounterRowProps) {
+function CounterRow({ title, subtitle, value, onDecrease, onIncrease }: CounterRowProps) {
   return (
-    <div
-      className="
-        flex
-        items-center
-        justify-between
-      "
-    >
-
+    <div className="flex items-center justify-between">
       <div>
-
-        <h4
-          className="
-            font-semibold
-            text-black
-            flex justify-start items-start
-          "
-        >
-          {title}
-        </h4>
-
-        <p
-          className="
-            text-sm
-            text-gray-500
-          "
-        >
-          {subtitle}
-        </p>
-
+        <h4 className="font-semibold text-black flex flext-start">{title}</h4>
+        <p className="text-sm text-gray-500">{subtitle}</p>
       </div>
-
-      <div
-        className="
-          flex
-          items-center
-          gap-4
-        "
-      >
-
-        <button
-          type="button"
-          onClick={onDecrease}
-          className="
-            w-10
-            h-10
-            rounded-full
-            border
-            border-gray-300
-            text-xl
-            bg-[#c29b6a]/30
-            hover:border-black
-            transition
-            cursor-pointer
-            text-black
-          "
-        >
-          -
-        </button>
-
-        <span
-          className="
-            w-5
-            text-center
-            font-medium
-            text-black
-          "
-        >
-          {value}
-        </span>
-
-        <button
-          type="button"
-          onClick={onIncrease}
-          className="
-            w-10
-            h-10
-            rounded-full
-            border
-            bg-[#c29b6a]/30
-            border-gray-300
-            text-xl
-            cursor-pointer
-            hover:border-black
-            transition
-            text-black
-          "
-        >
-          +
-        </button>
-
+      <div className="flex items-center gap-4">
+        <button type="button" onClick={onDecrease} className="w-10 h-10 rounded-full border border-gray-300 text-xl bg-[#c29b6a]/30 hover:border-black transition cursor-pointer text-black">-</button>
+        <span className="w-5 text-center font-medium text-black">{value}</span>
+        <button type="button" onClick={onIncrease} className="w-10 h-10 rounded-full border bg-[#c29b6a]/30 border-gray-300 text-xl cursor-pointer hover:border-black transition text-black">+</button>
       </div>
-
     </div>
   );
 }
